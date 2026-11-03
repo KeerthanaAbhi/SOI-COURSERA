@@ -10,9 +10,21 @@ spec:
       description: Name used to label the application resources.
       default: productfactory
   steps:
+    - name: run-unit-tests
+      image: python:3.11
+      workingDir: $(workspaces.source.path)
+      script: |
+        #!/bin/sh
+        set -eu
+        pip install nose
+        nosetests
+
     - name: delete-application-resources
       image: bitnami/kubectl:latest
       script: |
         #!/bin/sh
         set -eu
         kubectl delete deployment,service -l app=$(params.app-name) --ignore-not-found=true
+workspaces:
+  - name: source
+    description: Workspace containing the application source code and unit tests.
